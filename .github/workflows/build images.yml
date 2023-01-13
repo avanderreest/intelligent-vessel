@@ -1,34 +1,32 @@
-name: Build and Push Docker Images
+###########################################################
+# Build docker container 
+###########################################################
 
-on:
-  push:
-    branches:
-      - master
+name: Docker Build Smarte Edge
+
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Docker
-      uses: docker/setup-docker@v2
-
-    - name: Build and Push Docker Images
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Package Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GHCR_TOKEN }}
+    - name: install buildx
+      id: buildx
+      uses: crazy-max/ghaction-docker-buildx@v3
+      with:
+        version: latest
+    - name: docker build data collector monitor module
       run: |
-        # Build the Docker images
-        for module in "NmeaListner" "SampleModule"; do
+        for module in "NmeaListner" "SampleModule";do
           cd $module
-          docker build -t ghcr.io/${GHCR_USERNAME}/$module:latest .
-          cd ..
-        done
-
-        # Log in to ghcr.io
-        echo "${GHCR_TOKEN}" | docker login ghcr.io -u ${GHCR_USERNAME} --password-stdin
-
-        # Push the images to ghcr.io
-        for module in "NmeaListner" "SampleModule"; do
-          docker push ghcr.io/${GHCR_USERNAME}/$module:latest
-        done
+          docker buildx build --push \
+              --tag ghcr.io/${GHCR_USERNAME}/$module:latest
+              --platform linux/amd64  .
+        done 
