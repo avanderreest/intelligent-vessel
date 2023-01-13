@@ -4,7 +4,7 @@
 
 name: Docker Build Smarte Edge
 
-on: push
+on: [push]
 
 jobs:
   build:
@@ -27,6 +27,6 @@ jobs:
         for module in "NmeaListner" "SampleModule";do
           cd modules/$module
           docker buildx build --push \
-              -t ghcr.io/${{GHCR_USERNAME}}/$module:latest \
+              --tag ghcr.io/$${{ github.repository_owner }}/$module:latest
               --platform linux/amd64  .
         done 
