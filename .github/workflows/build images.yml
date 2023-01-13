@@ -1,10 +1,6 @@
-###########################################################
-# Build docker container 
-###########################################################
-
 name: Docker Build Smarte Edge
 
-on: [push]
+on: push
 
 jobs:
   build:
@@ -15,7 +11,7 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: ${{ github.repository_owner }}
+        username: "${{ github.repository_owner }}"
         password: ${{ secrets.GHCR_TOKEN }}
     - name: install buildx
       id: buildx
@@ -27,7 +23,7 @@ jobs:
         for module in "NmeaListner" "SampleModule";do
           cd modules/$module
           docker buildx build --push \
-              --tag ghcr.io/$${{ github.repository_owner }}/$module:latest
+              -t ghcr.io/${{ github.repository_owner }}/$module:latest \
               --platform linux/amd64  .
           cd ..
         done 
