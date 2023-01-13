@@ -25,7 +25,7 @@ jobs:
     - name: docker build data collector monitor module
       run: |
         for module in "NmeaListner" "SampleModule";do
-          cd $module
+          cd modules/$module
           docker buildx build --push \
               --tag ghcr.io/${GHCR_USERNAME}/$module:latest
               --platform linux/amd64  .
